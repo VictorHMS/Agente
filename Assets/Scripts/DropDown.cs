@@ -8,7 +8,7 @@ public class DropDown : MonoBehaviour
 {
 
     enum buscasType {
-        Largura, Profundidade, Custo_Uniforme, Gulosa, AStar
+        Largura, Profundidade, CustoUniforme, Gulosa, AStar
     };
 
     public Text TextBox;

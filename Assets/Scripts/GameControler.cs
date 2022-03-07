@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System;
 using UnityEngine.UI;
 
 public class GameControler : MonoBehaviour
@@ -20,14 +21,19 @@ public class GameControler : MonoBehaviour
     public Vector3 posAgente = new Vector3();
     enum buscasType
     {
-        Largura, Profundidade, Custo_Uniforme, Gulosa, AStar
+        Largura, Profundidade, CustoUniforme, Gulosa, AStar
     };
      //cons = Enum.Parse(typeof(buscasType), textinho.toString);
 
     void randAgente()
     {
-        int indI = (int)Random.Range(0.0f, (float)NROWS);
-        int indJ = (int)Random.Range(0.0f, (float)NCOLS);
+        int indI;
+        int indJ;
+        do
+        {
+            indI = (int)UnityEngine.Random.Range(0.0f, (float)NROWS);
+            indJ = (int)UnityEngine.Random.Range(0.0f, (float)NCOLS);
+        } while (getPeso(indI, indJ) == INF);
 
         posAgente = (tabuleiro[indI, indJ].transform.position);
         Debug.Log(indI);
@@ -36,16 +42,22 @@ public class GameControler : MonoBehaviour
 
     void randfruta()
     {
-        int indI = (int) Random.Range(0.0f, (float)NROWS);
-        int indJ = (int)Random.Range(0.0f, (float)NCOLS);
+        int indI;
+        int indJ;
+        do
+        {
+            indI = (int)UnityEngine.Random.Range(0.0f, (float)NROWS);
+            indJ = (int)UnityEngine.Random.Range(0.0f, (float)NCOLS);
+        } while (getPeso(indI, indJ) == INF);
+
         posFruta = tabuleiro[indI, indJ].transform.position;
     }
 
     void generateMap()
     {
-        float magnification = Random.Range(6.0f, 11.0f);
-        float xOffset = Random.Range(0.0f, 100.0f);
-        float yOffset = Random.Range(0.0f, 100.0f);
+        float magnification = UnityEngine.Random.Range(6.0f, 11.0f);
+        float xOffset = UnityEngine.Random.Range(0.0f, 100.0f);
+        float yOffset = UnityEngine.Random.Range(0.0f, 100.0f);
         for (int i = 0; i < NROWS; i++)
         {
             for (int j = 0; j < NCOLS; j++)
@@ -86,6 +98,18 @@ public class GameControler : MonoBehaviour
         return true;
     }
 
+    public void GotoPoint(Vector3 target) {
+        var diff = (target - posAgente).normalized;
+        posAgente = posAgente + diff*0.2f;
+    }
+
+    public void updateFruta() {
+        var distance = (posAgente - posFruta).magnitude;
+        if (distance < 0.7) {
+            randfruta();
+        }
+    }
+
     void Start()
     {
         field = GameObject.Find("Field");
@@ -120,7 +144,33 @@ public class GameControler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        
+        buscasType type = (buscasType) Enum.Parse(typeof(buscasType), textinho.text);
+        List<Vector3>path = new List<Vector3>();
+        switch(type) {
+            case buscasType.Largura:
+                //TODO: algotitmo
+                path.Add(posFruta); //temporariamente so vai para a fruto sem o path
+                break;
+            case buscasType.Profundidade:
+                //TODO: algotitmo
+                break;
+            case buscasType.CustoUniforme:
+                //TODO: algotitmo
+                break;
+            case buscasType.Gulosa:
+                //TODO: algotitmo
+                break;
+            case buscasType.AStar:
+                //TODO: algotitmo
+                break;
+        }
+
+        if (path.Count > 0) {
+            //achei um caminho
+            GotoPoint(path[0]);
+
+            updateFruta();
+        }
     }
 
 }
