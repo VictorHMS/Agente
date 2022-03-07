@@ -20,6 +20,12 @@ public class GameControler : MonoBehaviour
     public Vector3 posFruta = new Vector3();
     public Vector3 posAgente = new Vector3();
     public Tuple<int, int> indAgente, indFruta;
+    private Color agua = Color.blue;
+    private Color grama = Color.green;
+    private Color lama = Color.grey; //marrom
+    private Color muro = Color.magenta;
+    private Color[] cores;
+
     private int state = 0;
     Dfs dfs;
     Tuple<int, int> node;
@@ -80,11 +86,7 @@ public class GameControler : MonoBehaviour
             for (int j = 0; j < NCOLS; j++)
             {
                 Vector3 position = new Vector3((j * HEIGHT), (i * WIDTH), 0);
-                Color agua = Color.blue;
-                Color grama = Color.green;
-                Color lama = Color.grey; //marrom
-                Color muro = Color.magenta;
-                Color[] cores = { grama, agua, lama, muro };
+                
                 float xCoord = (position.x + xOffset) / magnification;
                 float yCoord = (position.y + yOffset) / magnification;
                 float val = Mathf.PerlinNoise(xCoord, yCoord);
@@ -135,6 +137,7 @@ public class GameControler : MonoBehaviour
         field = GameObject.Find("Field");
         tabuleiro = new GameObject[NROWS, NCOLS];
         campo = new int[NROWS, NCOLS];
+        cores = new Color[] { grama, agua, lama, muro };
         for (int i=0; i<NROWS; i++)
         {
             for(int j=0; j<NCOLS; j++)
@@ -209,7 +212,7 @@ public class GameControler : MonoBehaviour
         {
             float nt = Time.deltaTime;
             tempo += nt;
-            if(tempo >= 0.1)
+            if(tempo >= 0.01)
             {
                 if (exist(node.Item1, node.Item2)) esmaecer(node);
                 if (dfs.terminei) state = 0;
@@ -234,7 +237,11 @@ public class GameControler : MonoBehaviour
     void esmaecer(Tuple<int, int> posi)
     {
         var aux = tabuleiro[posi.Item1, posi.Item2].GetComponent<Renderer>();
-        aux.material.SetColor("_Color", Color.cyan);
+        aux.material.SetColor("_Color", cores[campo[posi.Item1,posi.Item2]]);
+        float r = aux.material.GetColor("_Color").r;
+        float g = aux.material.GetColor("_Color").g;
+        float b = aux.material.GetColor("_Color").b;
+        aux.material.SetColor("_Color", new Color(r,g,b,0.5f));
     }
 
 }
