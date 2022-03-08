@@ -6,7 +6,7 @@ using System;
 
 public class Dfs : PathFinder
 {
-    Stack<Tuple<int, int, int>> pilha = new Stack<Tuple<int, int, int>>(); //na tupla tem a posição a ser analizada e o ultimo índice analisado para poder continuar a iteração
+    public Stack<Tuple<int, int, int>> pilha = new Stack<Tuple<int, int, int>>(); //na tupla tem a posição a ser analizada e o ultimo índice analisado para poder continuar a iteração
     
     public override void init(Tuple<int, int> inicial) //inicial
     {
@@ -15,7 +15,10 @@ public class Dfs : PathFinder
         int j = inicial.Item2;
         Debug.Log("deu a");
         visited = new bool[controle.getNRows(), controle.getNCols()];
+
+        pilha.Clear();
         pilha.Push(new Tuple<int, int, int>(0, i, j));
+        
         terminei = false;
         
     }
@@ -56,7 +59,9 @@ public class Dfs : PathFinder
                     next = new Tuple<int, int>(node.Item2, node.Item3);
                     pilha.Push(new Tuple<int, int, int>(0, node.Item2, node.Item3));
 
-                    if (next.Item1 == destino.Item1 && next.Item2 == destino.Item2) terminei = true;
+                    if (next.Item1 == destino.Item1 && next.Item2 == destino.Item2) {
+                        terminei = true;
+                    }
                     //debug:
                     if (node.Item2 == -1) Debug.Log("Nao atualizou o 2");
 

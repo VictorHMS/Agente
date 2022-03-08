@@ -25,6 +25,7 @@ public class GameControler : MonoBehaviour
     private Color lama = Color.grey; //marrom
     private Color muro = Color.magenta;
     private Color[] cores;
+    private List<Vector3> path = new List<Vector3>();
 
     private int state = 0;
     Dfs dfs;
@@ -120,8 +121,9 @@ public class GameControler : MonoBehaviour
     }
 
     public void GotoPoint(Vector3 target) {
+        Debug.Log(target);
         var diff = (target - posAgente).normalized;
-        posAgente = posAgente + diff*0.2f;
+        posAgente = posAgente + diff*0.1f;
     }
 
     public void updateFruta() {
@@ -167,10 +169,20 @@ public class GameControler : MonoBehaviour
     // Update is called once per frame
     void Update()
     {
-        if (state == 5)
+        if (state == 0)
+        {
+            generateMap();
+            state = 2;
+        }
+        else if (state == 2)
+        {
+            dfs.init(indAgente);
+            state = 3;
+        }
+        else if (state == 3)
         {
             buscasType type = (buscasType)Enum.Parse(typeof(buscasType), textinho.text);
-            List<Vector3> path = new List<Vector3>();
+
             switch (type)
             {
                 case buscasType.Largura:
@@ -178,7 +190,26 @@ public class GameControler : MonoBehaviour
                     path.Add(posFruta); //temporariamente so vai para a fruto sem o path
                     break;
                 case buscasType.Profundidade:
-                    //TODO: algotitmo
+                    float nt = Time.deltaTime;
+                    tempo += nt;
+                    if (tempo >= 0.01)
+                    {
+                        if (exist(node.Item1, node.Item2)) esmaecer(node);
+                        if (dfs.terminei) { 
+                            state = 4;
+                            while (dfs.pilha.Count > 0) {
+                                var elem = dfs.pilha.Pop();
+                                path.Add(new Vector3(elem.Item2, elem.Item3));
+                            }
+                            path.Reverse();
+                        }
+                        else
+                        {
+                            node = dfs.iteration(indFruta);
+                            if (exist(node.Item1, node.Item2)) pintar(node);
+                        }
+                        tempo = 0;
+                    }
                     break;
                 case buscasType.CustoUniforme:
                     //TODO: algotitmo
@@ -190,42 +221,39 @@ public class GameControler : MonoBehaviour
                     //TODO: algotitmo
                     break;
             }
+        }
+        else if (state == 4) {
+            // draw path
+            foreach (var elem in path) {
+                var aux = tabuleiro[(int)elem.x, (int)elem.y].GetComponent<Renderer>();
+                aux.material.SetColor("_Color", Color.red);
+            }
 
+            state = 5;
+        }
+        else if (state == 5)
+        {
+            //execute path
             if (path.Count > 0)
             {
-                //achei um caminho
-                GotoPoint(path[0]);
-
-                updateFruta();
-            }
-        }
-        else if (state == 0)
-        {
-            generateMap();
-            state = 1;
-        }
-        else if(state == 1)
-        {
-            dfs.init(indAgente);
-            state = 2;
-        }else if(state == 2)
-        {
-            float nt = Time.deltaTime;
-            tempo += nt;
-            if(tempo >= 0.01)
-            {
-                if (exist(node.Item1, node.Item2)) esmaecer(node);
-                if (dfs.terminei) state = 0;
-                else
+                Vector3 targePos = tabuleiro[(int)path[0].x, (int)path[0].y].transform.position;
+                var distance = (posAgente - targePos).magnitude;
+                if (distance < 0.1)
                 {
-                    node = dfs.iteration(indFruta);
-                    if(exist(node.Item1,node.Item2))pintar(node);
+                    path.RemoveAt(0);
                 }
-                tempo = 0;
-            }
-            
-        }
 
+                GotoPoint(targePos);
+
+                if ((posAgente - posFruta).magnitude < 0.1)
+                {
+                    state = 0;
+                }
+            }
+            else {
+                GotoPoint(posFruta);
+            }
+        }
     }
 
     void pintar(Tuple<int,int> posi)
