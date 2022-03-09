@@ -1122,6 +1122,8 @@ MonoBehaviour:
   field: {fileID: 41234546}
   tile: {fileID: 1584550652}
   textinho: {fileID: 542772210}
+  tbusca: 0.01
+  speed: 0.5
   posFruta: {x: 0, y: 0, z: 0}
   posAgente: {x: 0, y: 0, z: 0}
 --- !u!4 &1021906859
