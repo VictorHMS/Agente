@@ -29,6 +29,7 @@ public class GameControler : MonoBehaviour
 
     private int state = 0;
     Dfs dfs;
+    Bfs bfs;
     Tuple<int, int> node;
     float tempo = 0;
     enum buscasType
@@ -121,7 +122,6 @@ public class GameControler : MonoBehaviour
     }
 
     public void GotoPoint(Vector3 target) {
-        Debug.Log(target);
         var diff = (target - posAgente).normalized;
         posAgente = posAgente + diff*0.1f;
     }
@@ -136,6 +136,7 @@ public class GameControler : MonoBehaviour
     void Start()
     {
         dfs = gameObject.AddComponent<Dfs>();
+        bfs = gameObject.AddComponent<Bfs>();
         field = GameObject.Find("Field");
         tabuleiro = new GameObject[NROWS, NCOLS];
         campo = new int[NROWS, NCOLS];
@@ -177,6 +178,7 @@ public class GameControler : MonoBehaviour
         else if (state == 2)
         {
             dfs.init(indAgente);
+            bfs.init(indAgente);
             state = 3;
         }
         else if (state == 3)
@@ -186,40 +188,78 @@ public class GameControler : MonoBehaviour
             switch (type)
             {
                 case buscasType.Largura:
-                    //TODO: algotitmo
-                    path.Add(posFruta); //temporariamente so vai para a fruto sem o path
-                    break;
-                case buscasType.Profundidade:
-                    float nt = Time.deltaTime;
-                    tempo += nt;
-                    if (tempo >= 0.01)
                     {
-                        if (exist(node.Item1, node.Item2)) esmaecer(node);
-                        if (dfs.terminei) { 
-                            state = 4;
-                            while (dfs.pilha.Count > 0) {
-                                var elem = dfs.pilha.Pop();
-                                path.Add(new Vector3(elem.Item2, elem.Item3));
-                            }
-                            path.Reverse();
-                        }
-                        else
+
+                        float nt = Time.deltaTime;
+                        tempo += nt;
+                        if (tempo >= 0.01)
                         {
-                            node = dfs.iteration(indFruta);
-                            if (exist(node.Item1, node.Item2)) pintar(node);
+                            if (exist(node.Item1, node.Item2)) esmaecer(node);
+                            if (bfs.terminei)
+                            {
+                                state = 4;
+                                var current = new Vector3(indFruta.Item1, indFruta.Item2);
+                                while (bfs.nodeParents.Count > 0 && current != new Vector3(indAgente.Item1, indAgente.Item2))
+                                {
+                                    path.Add(current);
+                                    if (bfs.nodeParents.ContainsKey(current)) {
+                                        current = bfs.nodeParents[current];
+                                    }
+                                    
+                                }
+                                path.Reverse();
+                            }
+                            else
+                            {
+                                node = bfs.iteration(indFruta);
+                                if (exist(node.Item1, node.Item2)) pintar(node);
+                            }
+                            tempo = 0;
                         }
-                        tempo = 0;
+                        break;
+
                     }
-                    break;
+                case buscasType.Profundidade:
+                    {
+                        float nt = Time.deltaTime;
+                        tempo += nt;
+                        if (tempo >= 0.01)
+                        {
+                            if (exist(node.Item1, node.Item2)) esmaecer(node);
+                            if (dfs.terminei)
+                            {
+                                state = 4;
+                                while (dfs.pilha.Count > 0)
+                                {
+                                    var elem = dfs.pilha.Pop();
+                                    path.Add(new Vector3(elem.Item2, elem.Item3));
+                                }
+                                path.Reverse();
+                            }
+                            else
+                            {
+                                node = dfs.iteration(indFruta);
+                                if (exist(node.Item1, node.Item2)) pintar(node);
+                            }
+                            tempo = 0;
+                        }
+                        break;
+                    }
                 case buscasType.CustoUniforme:
-                    //TODO: algotitmo
-                    break;
+                    {
+                        //TODO: algotitmo
+                        break;
+                    }
                 case buscasType.Gulosa:
-                    //TODO: algotitmo
-                    break;
+                    {
+                        //TODO: algotitmo
+                        break;
+                    }
                 case buscasType.AStar:
-                    //TODO: algotitmo
-                    break;
+                    {
+                        //TODO: algotitmo
+                        break;
+                    }
             }
         }
         else if (state == 4) {
@@ -238,14 +278,14 @@ public class GameControler : MonoBehaviour
             {
                 Vector3 targePos = tabuleiro[(int)path[0].x, (int)path[0].y].transform.position;
                 var distance = (posAgente - targePos).magnitude;
-                if (distance < 0.1)
+                if (distance < 0.4)
                 {
                     path.RemoveAt(0);
                 }
 
                 GotoPoint(targePos);
 
-                if ((posAgente - posFruta).magnitude < 0.1)
+                if ((posAgente - posFruta).magnitude < 0.4)
                 {
                     state = 0;
                 }
