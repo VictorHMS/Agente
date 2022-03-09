@@ -17,6 +17,8 @@ public class GameControler : MonoBehaviour
     public const int NROWS = 40;
     public const int NCOLS = 60;
     public const int INF = 1000000000;
+    public float tbusca = 0.01f;
+    public float speed = 0.5f;
     public Vector3 posFruta = new Vector3();
     public Vector3 posAgente = new Vector3();
     public Tuple<int, int> indAgente, indFruta;
@@ -123,7 +125,7 @@ public class GameControler : MonoBehaviour
 
     public void GotoPoint(Vector3 target) {
         var diff = (target - posAgente).normalized;
-        posAgente = posAgente + diff*0.1f;
+        posAgente = posAgente + diff*speed;
     }
 
     public void updateFruta() {
@@ -192,18 +194,24 @@ public class GameControler : MonoBehaviour
 
                         float nt = Time.deltaTime;
                         tempo += nt;
-                        if (tempo >= 0.01)
+                        if (tempo >= tbusca)
                         {
                             if (exist(node.Item1, node.Item2)) esmaecer(node);
                             if (bfs.terminei)
                             {
                                 state = 4;
                                 var current = new Vector3(indFruta.Item1, indFruta.Item2);
-                                while (bfs.nodeParents.Count > 0 && current != new Vector3(indAgente.Item1, indAgente.Item2))
+                                while (bfs.nodeParents.Count > 0 )
                                 {
                                     path.Add(current);
                                     if (bfs.nodeParents.ContainsKey(current)) {
+                                        var aux = current;
                                         current = bfs.nodeParents[current];
+                                        bfs.nodeParents.Remove(aux);
+                                    }
+                                    else
+                                    {
+                                        break;
                                     }
                                     
                                 }
@@ -223,7 +231,7 @@ public class GameControler : MonoBehaviour
                     {
                         float nt = Time.deltaTime;
                         tempo += nt;
-                        if (tempo >= 0.01)
+                        if (tempo >= tbusca)
                         {
                             if (exist(node.Item1, node.Item2)) esmaecer(node);
                             if (dfs.terminei)
@@ -266,7 +274,7 @@ public class GameControler : MonoBehaviour
             // draw path
             foreach (var elem in path) {
                 var aux = tabuleiro[(int)elem.x, (int)elem.y].GetComponent<Renderer>();
-                aux.material.SetColor("_Color", Color.red);
+                aux.material.SetColor("_Color", Color.black);
             }
 
             state = 5;
