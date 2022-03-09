@@ -24,10 +24,15 @@ public class PathFinder : MonoBehaviour
 
     }
 
+    public virtual List<Vector3> getPath(Tuple<int, int> target) {
+        return new List<Vector3>();
+    }
+
     public virtual Tuple<int, int> iteration(Tuple<int,int> destino)
     {
         return new Tuple<int, int>(0, 0);
     }
+
     // Start is called before the first frame update
     void Start()
     {

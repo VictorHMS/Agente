@@ -8,7 +8,7 @@ public class Bfs : PathFinder
 
     public Queue<Tuple<int, int, int>> fila = new Queue<Tuple<int, int, int>>(); //na tupla tem a posição a ser analizada e o ultimo índice analisado para poder continuar a iteração
     public Dictionary<Vector3, Vector3> nodeParents = new Dictionary<Vector3, Vector3>();
-    int accumulatedCost;
+
     public override void init(Tuple<int, int> inicial) //inicial
     {
         controle = gameObject.GetComponent<GameControler>();
@@ -23,44 +23,7 @@ public class Bfs : PathFinder
         terminei = false;
 
     }
-    public Tuple<int, int, int> FindShortestPathBFS(Tuple<int, int, int> startPosition, Tuple<int, int, int> goalPosition)
-    {
 
-        float timeNow = Time.realtimeSinceStartup;
-
-        Queue<Tuple<int, int, int>> queue = new Queue<Tuple<int, int, int>>();
-        HashSet<Tuple<int, int, int>> exploredNodes = new HashSet<Tuple<int, int, int>>();
-        queue.Enqueue(startPosition);
-
-        while (queue.Count != 0)
-        {
-            Tuple<int, int, int> currentNode = queue.Dequeue();
-
-            if (currentNode == goalPosition)
-            {
-                return currentNode;
-            }
-
-            List<Tuple<int, int, int>> nodes = getAdjCells(currentNode.Item2, currentNode.Item3);
-
-            foreach (Tuple<int, int, int> node in nodes)
-            {
-                if (!exploredNodes.Contains(node))
-                {
-                    //Mark the node as explored
-                    exploredNodes.Add(node);
-
-                    //Store a reference to the previous node
-                    nodeParents.Add(new Vector3(node.Item2, node.Item3), new Vector3(currentNode.Item2, currentNode.Item3) );
-
-                    //Add this to the queue of nodes to examine
-                    queue.Enqueue(node);
-                }
-            }
-        }
-
-        return startPosition;
-    }
     public override Tuple<int, int> iteration(Tuple<int, int> destino)
     {
 
@@ -99,55 +62,36 @@ public class Bfs : PathFinder
                 }
             }
             return next;
-
-            /*
-            if (adj.Count > aux.Item1)
-            {
-                int val = 0;
-                bool deu = false;
-                while (val + aux.Item1 < adj.Count)
-                {
-                    node = adj[aux.Item1 + val];
-                    if (!visited[node.Item2, node.Item3])
-                    {
-                        deu = true;
-                        break;
-                    }
-                    val++;
-                }
-                //debug:
-                if (aux.Item2 == -1) Debug.Log("Nao atualizou");
-
-                //fila.Enqueue(new Tuple<int, int, int>(aux.Item1 + val + 1, aux.Item2, aux.Item3));
-                
-                if (deu)
-                {
-                    Vector3 nodeInVect = new Vector3(node.Item2, node.Item3);
-                    if (nodeParents.ContainsKey(nodeInVect))
-                    {
-                        nodeParents[nodeInVect] = new Vector3(aux.Item2, aux.Item3);
-                    }
-                    else { 
-                        nodeParents.Add(nodeInVect, new Vector3(aux.Item2, aux.Item3));
-                    }
-                    
-                    visited[node.Item2, node.Item3] = true;
-                    
-                    fila.Enqueue(new Tuple<int, int, int>(0, node.Item2, node.Item3));
-
-                    
-                    //debug:
-                    if (node.Item2 == -1) Debug.Log("Nao atualizou o 2");
-
-                    return next;
-                }
-
-            }*/
         }
 
         terminei = true;
 
         return next;
 
+    }
+
+    public override List<Vector3> getPath(Tuple<int, int> target)
+    {
+        List<Vector3> path = new List<Vector3>();
+
+        var current = new Vector3(target.Item1, target.Item2);
+        while (nodeParents.Count > 0)
+        {
+            path.Add(current);
+            if (nodeParents.ContainsKey(current))
+            {
+                var aux = current;
+                current = nodeParents[current];
+                nodeParents.Remove(aux);
+            }
+            else
+            {
+                break;
+            }
+
+        }
+        path.Reverse();
+
+        return path;
     }
 }

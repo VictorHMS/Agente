@@ -13,7 +13,7 @@ public class Dfs : PathFinder
         controle = gameObject.GetComponent<GameControler>();
         int i = inicial.Item1;
         int j = inicial.Item2;
-        Debug.Log("deu a");
+
         visited = new bool[controle.getNRows(), controle.getNCols()];
 
         pilha.Clear();
@@ -48,8 +48,6 @@ public class Dfs : PathFinder
                     }
                     val++;
                 }
-                //debug:
-                if (aux.Item2 == -1) Debug.Log("Nao atualizou");
 
                 pilha.Push(new Tuple<int, int, int>(aux.Item1 + val + 1, aux.Item2, aux.Item3));
 
@@ -62,8 +60,6 @@ public class Dfs : PathFinder
                     if (next.Item1 == destino.Item1 && next.Item2 == destino.Item2) {
                         terminei = true;
                     }
-                    //debug:
-                    if (node.Item2 == -1) Debug.Log("Nao atualizou o 2");
 
                     return next;
                 }
@@ -75,5 +71,17 @@ public class Dfs : PathFinder
 
         return next;
 
+    }
+
+    public override List<Vector3> getPath(Tuple<int, int> target) {
+        List<Vector3> path = new List<Vector3>();
+        while (pilha.Count > 0)
+        {
+            var elem = pilha.Pop();
+            path.Add(new Vector3(elem.Item2, elem.Item3));
+        }
+        path.Reverse();
+
+        return path;
     }
 }

@@ -27,18 +27,18 @@ public class GameControler : MonoBehaviour
     private Color lama = Color.grey; //marrom
     private Color muro = Color.magenta;
     private Color[] cores;
-    private List<Vector3> path = new List<Vector3>();
+    private List<Vector3> path;
 
     private int state = 0;
     Dfs dfs;
     Bfs bfs;
     Tuple<int, int> node;
+    buscasType buscaType = buscasType.Largura;
     float tempo = 0;
     enum buscasType
     {
         Largura, Profundidade, CustoUniforme, Gulosa, AStar
     };
-     //cons = Enum.Parse(typeof(buscasType), textinho.toString);
 
     public int getNRows()
     {
@@ -148,22 +148,7 @@ public class GameControler : MonoBehaviour
             for(int j=0; j<NCOLS; j++)
             {
                 Vector3 position = new Vector3((j * HEIGHT), (i * WIDTH), 0);
-                tabuleiro[i,j] = Instantiate(tile,position, new Quaternion());
-                /*Color agua = Color.blue;
-                Color grama = Color.green;
-                Color lama = Color.grey; //marrom
-                Color muro = Color.magenta;
-                Color[] cores = { grama, agua, lama, muro };
-                float xCoord = position.x / 7f;
-                float yCoord = position.y/ 7f;
-                float val = Mathf.PerlinNoise(xCoord, yCoord);
-                Debug.Log(val);
-                //Debug.Log(position.x);
-                //Debug.Log(position.y);
-                val = Mathf.Max(Mathf.Min(val, 0.99f), 0.1f);
-                int index = (int) (val*4);
-                var aux = tabuleiro[i, j].GetComponent<Renderer>();
-                aux.material.SetColor("_Color", cores[index]);*/                
+                tabuleiro[i,j] = Instantiate(tile,position, new Quaternion());            
             }
         }
         generateMap();
@@ -174,20 +159,50 @@ public class GameControler : MonoBehaviour
     {
         if (state == 0)
         {
+            //generate World
             generateMap();
             state = 2;
         }
         else if (state == 2)
         {
-            dfs.init(indAgente);
-            bfs.init(indAgente);
+            //init pathFinder
+            buscaType = (buscasType)Enum.Parse(typeof(buscasType), textinho.text);
+
+            switch (buscaType)
+            {
+                case buscasType.Largura:
+                    {
+                        bfs.init(indAgente);
+                        break;
+                    }
+                case buscasType.Profundidade:
+                    {
+                        dfs.init(indAgente);
+                        break;
+                    }
+                case buscasType.CustoUniforme:
+                    {
+                        //TODO: algotitmo
+                        break;
+                    }
+                case buscasType.Gulosa:
+                    {
+                        //TODO: algotitmo
+                        break;
+                    }
+                case buscasType.AStar:
+                    {
+                        //TODO: algotitmo
+                        break;
+                    }
+            }
+     
             state = 3;
         }
         else if (state == 3)
         {
-            buscasType type = (buscasType)Enum.Parse(typeof(buscasType), textinho.text);
-
-            switch (type)
+            //find path
+            switch (buscaType)
             {
                 case buscasType.Largura:
                     {
@@ -200,22 +215,7 @@ public class GameControler : MonoBehaviour
                             if (bfs.terminei)
                             {
                                 state = 4;
-                                var current = new Vector3(indFruta.Item1, indFruta.Item2);
-                                while (bfs.nodeParents.Count > 0 )
-                                {
-                                    path.Add(current);
-                                    if (bfs.nodeParents.ContainsKey(current)) {
-                                        var aux = current;
-                                        current = bfs.nodeParents[current];
-                                        bfs.nodeParents.Remove(aux);
-                                    }
-                                    else
-                                    {
-                                        break;
-                                    }
-                                    
-                                }
-                                path.Reverse();
+                                path = bfs.getPath(indFruta);
                             }
                             else
                             {
@@ -237,12 +237,7 @@ public class GameControler : MonoBehaviour
                             if (dfs.terminei)
                             {
                                 state = 4;
-                                while (dfs.pilha.Count > 0)
-                                {
-                                    var elem = dfs.pilha.Pop();
-                                    path.Add(new Vector3(elem.Item2, elem.Item3));
-                                }
-                                path.Reverse();
+                               path = dfs.getPath(indFruta);    
                             }
                             else
                             {
