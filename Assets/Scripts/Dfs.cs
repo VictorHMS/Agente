@@ -18,7 +18,7 @@ public class Dfs : PathFinder
 
         pilha.Clear();
         pilha.Push(new Tuple<int, int, int>(0, i, j));
-        
+        visited[i, j] = true;
         terminei = false;
         
     }

@@ -32,6 +32,7 @@ public class GameControler : MonoBehaviour
     private int state = 0;
     Dfs dfs;
     Bfs bfs;
+    PathFinder busca;
     Tuple<int, int> node;
     buscasType buscaType = buscasType.Largura;
     float tempo = 0;
@@ -139,6 +140,8 @@ public class GameControler : MonoBehaviour
     {
         dfs = gameObject.AddComponent<Dfs>();
         bfs = gameObject.AddComponent<Bfs>();
+        busca = gameObject.AddComponent<PathFinder>();
+
         field = GameObject.Find("Field");
         tabuleiro = new GameObject[NROWS, NCOLS];
         campo = new int[NROWS, NCOLS];
@@ -172,12 +175,16 @@ public class GameControler : MonoBehaviour
             {
                 case buscasType.Largura:
                     {
-                        bfs.init(indAgente);
+                        busca = bfs;
+                        busca.init(indAgente);
+                        //bfs.init(indAgente);
                         break;
                     }
                 case buscasType.Profundidade:
                     {
-                        dfs.init(indAgente);
+                        busca = dfs;
+                        busca.init(indAgente);
+                        //dfs.init(indAgente);
                         break;
                     }
                 case buscasType.CustoUniforme:
@@ -202,6 +209,24 @@ public class GameControler : MonoBehaviour
         else if (state == 3)
         {
             //find path
+            float nt = Time.deltaTime;
+            tempo += nt;
+            if (tempo >= tbusca)
+            {
+                if (exist(node.Item1, node.Item2)) esmaecer(node);
+                if (busca.terminei)
+                {
+                    state = 4;
+                    path = busca.getPath(indFruta);
+                }
+                else
+                {
+                    node = busca.iteration(indFruta);
+                    if (exist(node.Item1, node.Item2)) pintar(node);
+                }
+                tempo = 0;
+            }
+            /*
             switch (buscaType)
             {
                 case buscasType.Largura:
@@ -212,14 +237,14 @@ public class GameControler : MonoBehaviour
                         if (tempo >= tbusca)
                         {
                             if (exist(node.Item1, node.Item2)) esmaecer(node);
-                            if (bfs.terminei)
+                            if (busca.terminei)
                             {
                                 state = 4;
-                                path = bfs.getPath(indFruta);
+                                path = busca.getPath(indFruta);
                             }
                             else
                             {
-                                node = bfs.iteration(indFruta);
+                                node = busca.iteration(indFruta);
                                 if (exist(node.Item1, node.Item2)) pintar(node);
                             }
                             tempo = 0;
@@ -234,14 +259,14 @@ public class GameControler : MonoBehaviour
                         if (tempo >= tbusca)
                         {
                             if (exist(node.Item1, node.Item2)) esmaecer(node);
-                            if (dfs.terminei)
+                            if (busca.terminei)
                             {
                                 state = 4;
-                               path = dfs.getPath(indFruta);    
+                               path = busca.getPath(indFruta);    
                             }
                             else
                             {
-                                node = dfs.iteration(indFruta);
+                                node = busca.iteration(indFruta);
                                 if (exist(node.Item1, node.Item2)) pintar(node);
                             }
                             tempo = 0;
@@ -263,7 +288,7 @@ public class GameControler : MonoBehaviour
                         //TODO: algotitmo
                         break;
                     }
-            }
+            }*/
         }
         else if (state == 4) {
             // draw path
