@@ -41,8 +41,10 @@ public class GameControler : MonoBehaviour
     Dfs dfs;
     Bfs bfs;
     CustoUniforme custoUniforme;
+    Guloso guloso;
     Astrela astrela;
     PathFinder busca;
+
     Tuple<int, int> node;
     buscasType buscaType = buscasType.Largura;
     float tempo = 0;
@@ -152,6 +154,7 @@ public class GameControler : MonoBehaviour
         bfs = gameObject.AddComponent<Bfs>();
         custoUniforme = gameObject.AddComponent<CustoUniforme>();
         astrela = gameObject.AddComponent<Astrela>();
+        guloso = gameObject.AddComponent<Guloso>();
         busca = gameObject.AddComponent<PathFinder>();
 
         
@@ -219,7 +222,8 @@ public class GameControler : MonoBehaviour
                     }
                 case buscasType.Gulosa:
                     {
-                        //TODO: algotitmo
+                        busca = guloso;
+                        busca.init(indAgente);
                         break;
                     }
                 case buscasType.AStar:
