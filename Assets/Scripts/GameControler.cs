@@ -32,6 +32,8 @@ public class GameControler : MonoBehaviour
     private int state = 0;
     Dfs dfs;
     Bfs bfs;
+
+    CustoUniforme custoUniforme;
     PathFinder busca;
     Tuple<int, int> node;
     buscasType buscaType = buscasType.Largura;
@@ -140,6 +142,7 @@ public class GameControler : MonoBehaviour
     {
         dfs = gameObject.AddComponent<Dfs>();
         bfs = gameObject.AddComponent<Bfs>();
+        custoUniforme = gameObject.AddComponent<CustoUniforme>();
         busca = gameObject.AddComponent<PathFinder>();
 
         field = GameObject.Find("Field");
@@ -189,7 +192,8 @@ public class GameControler : MonoBehaviour
                     }
                 case buscasType.CustoUniforme:
                     {
-                        //TODO: algotitmo
+                        busca = custoUniforme;
+                        busca.init(indAgente);
                         break;
                     }
                 case buscasType.Gulosa:
