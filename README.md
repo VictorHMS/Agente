@@ -2,7 +2,7 @@
 
 ## Como buildar a aplicação:
 
-### -MacOS:
+### MacOS:
 
   1.Baixar arquivo agente/Contents
   
@@ -10,4 +10,8 @@
   
   3.Rodar aplicativo agente
 
-### -Windows:
+### Windows:
+
+  1.Baixar arquivo agente.exe
+  
+  2.Executar arquivo agente.exe
