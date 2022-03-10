@@ -1,8 +1,8 @@
 # Agente
 
-Como buildar a aplicação:
+## Como buildar a aplicação:
 
--MacOS:
+### -MacOS:
 
   1.Baixar arquivo agente/Contents
   
@@ -10,4 +10,4 @@ Como buildar a aplicação:
   
   3.Rodar aplicativo agente
 
--Windows:
+### -Windows:
