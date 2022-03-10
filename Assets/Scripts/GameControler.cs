@@ -72,8 +72,8 @@ public class GameControler : MonoBehaviour
 
         posAgente = (tabuleiro[indI, indJ].transform.position);
         indAgente = new Tuple<int, int>(indI,indJ);
-        Debug.Log(indI);
-        Debug.Log(indJ);
+        //Debug.Log(indI);
+        //Debug.Log(indJ);
     }
 
     void randfruta()

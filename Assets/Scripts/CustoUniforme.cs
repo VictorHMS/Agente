@@ -6,13 +6,13 @@ using System;
 
 public class CustoUniforme : PathFinder {
     //public IPriorityQueue<Tuple <int, int, int> , int  > fila = new PriorityQueue<Tuple<int, int, int> , int >();
-    public PriorityQueue<Tuple <int, int, int> , int  > fila = new PriorityQueue<Tuple<int, int, int> , int >();
+    public PriorityQueue<Tuple <int, int, int>> fila = new PriorityQueue<Tuple<int, int, int>>();
     public Dictionary<Vector3, Vector3> nodeParents = new Dictionary<Vector3, Vector3>();
 
     public int[,] dist;
     int accumulatedCost = 0;
 
-    public override async void init(Tuple<int, int> inicial) //inicial
+    public override void init(Tuple<int, int> inicial) //inicial
     {
         controle = gameObject.GetComponent<GameControler>();
         int i = inicial.Item1;
@@ -22,8 +22,9 @@ public class CustoUniforme : PathFinder {
 
         dist = new int[controle.getNRows(), controle.getNCols()];
         for(int linha = 0 ; linha < controle.getNRows() ; linha++){
-            for(int coluna = 0 ; coluna < conrole.getNCols() ; coluna++){
-                dist[i , j] = int.MaxValue;
+            for(int coluna = 0 ; coluna < controle.getNCols() ; coluna++){
+                dist[linha, coluna] = int.MaxValue;
+                visited[linha, coluna] = false;
             }
         }
         dist[i , j] = 0;
@@ -38,6 +39,7 @@ public class CustoUniforme : PathFinder {
 
     public override Tuple<int, int> iteration(Tuple<int, int> destino)
     {
+   
 
         Tuple<int, int, int> aux = new Tuple<int, int, int>(-1, -1, -1);
         Tuple<int, int> next = new Tuple<int, int>(-1, -1);
@@ -50,7 +52,7 @@ public class CustoUniforme : PathFinder {
             } while(!fila.empty() && visited[aux.Item2 , aux.Item3]);
             if(visited[aux.Item2 , aux.Item3]){
                 terminei = true;
-                return aux;
+                return new Tuple<int, int>(aux.Item2, aux.Item3);
             }
             visited[aux.Item2 , aux.Item3] = true;
 
@@ -60,6 +62,7 @@ public class CustoUniforme : PathFinder {
             if (next.Item1 == destino.Item1 && next.Item2 == destino.Item2)
             {
                 terminei = true;
+                return next;
             }
 
             for (int i=0; i<adj.Count; i++)
@@ -67,18 +70,25 @@ public class CustoUniforme : PathFinder {
                 node = adj[i];
                 if(!visited[node.Item2, node.Item3])
                 {
-
-                    if (nodeParents.x + node.Item1 < dist[node.Item2 , node.Item3]){
-                        Vector3 nodeInVect = new Vector3(node.Item1 , node.Item2, node.Item3);
+                    /*Debug.Log("Entrei");
+                    Debug.Log("Val1: ");
+                    Debug.Log(aux.Item1 + node.Item1);
+                    Debug.Log("Val2: ");
+                    Debug.Log(dist[node.Item2, node.Item3]);
+                    */
+                    if (aux.Item1 + node.Item1 < dist[node.Item2 , node.Item3]){
+                        Vector3 nodeInVect = new Vector3(node.Item2, node.Item3);
                         if (nodeParents.ContainsKey(nodeInVect)){
-                            nodeParents[nodeInVect] = new Vector3(aux.Item1 ,aux.Item2, aux.Item3);
+                            nodeParents[nodeInVect] = new Vector3(aux.Item2, aux.Item3);
                         }
                         else
                         {
-                            nodeParents.Add(nodeInVect, new Vector3(aux.Item1 , aux.Item2, aux.Item3));
+                            nodeParents.Add(nodeInVect, new Vector3(aux.Item2, aux.Item3));
                         }
-                        dist[node.Item2 , node.Item3] = nodeParents.x + node.Item1;
-                        fila.Enqueue(new Tuple<int, int, int>(dist[node.Item2 , node.Item3], node.Item2, node.Item3) , dist[node.Item2 , node.Item3]);
+                        dist[node.Item2 , node.Item3] = aux.Item1 + node.Item1;
+                        fila.Enqueue(new Tuple<int, int, int>(dist[node.Item2, node.Item3], node.Item2, node.Item3), dist[node.Item2, node.Item3]);
+                        //Debug
+                        //Debug.Log("Adicionei: " + aux.Item2.ToString() + " " + aux.Item3.ToString() + " eh pai de " + node.Item2.ToString() + " " + node.Item3.ToString());
                     }
                 }
 
