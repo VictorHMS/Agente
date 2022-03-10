@@ -11,6 +11,7 @@ public class GameControler : MonoBehaviour
     public int[,] campo;
     public int[] weight = { 1, 5, 3, INF };
     public GameObject field;
+    public GameObject canvas;
     public GameObject tile;
     public Text textinho;
     private const float WIDTH = 1f, HEIGHT = 1f;
@@ -27,7 +28,13 @@ public class GameControler : MonoBehaviour
     private Color lama = Color.grey; //marrom
     private Color muro = Color.magenta;
     private Color[] cores;
+    private int energia;
+    private int score;
+    private int[] custos;
     private List<Vector3> path;
+
+    public Text pontinhos;
+    public Text gastos;
 
     private int state = 0;
     Dfs dfs;
@@ -145,10 +152,20 @@ public class GameControler : MonoBehaviour
         custoUniforme = gameObject.AddComponent<CustoUniforme>();
         busca = gameObject.AddComponent<PathFinder>();
 
+        
+
         field = GameObject.Find("Field");
+        canvas = GameObject.Find("Canvas");
+
+
+        pontinhos.text = "Frutas: 0";
+        gastos.text = "Custo: 0";
+        score = 0;
+
         tabuleiro = new GameObject[NROWS, NCOLS];
         campo = new int[NROWS, NCOLS];
         cores = new Color[] { grama, agua, lama, muro };
+        custos = new int[] {1, 10, 5, 1000000000};
         for (int i=0; i<NROWS; i++)
         {
             for(int j=0; j<NCOLS; j++)
@@ -166,6 +183,7 @@ public class GameControler : MonoBehaviour
         if (state == 0)
         {
             //generate World
+            pontinhos.text = "Frutas: " + score.ToString();
             generateMap();
             state = 2;
         }
@@ -173,7 +191,8 @@ public class GameControler : MonoBehaviour
         {
             //init pathFinder
             buscaType = (buscasType)Enum.Parse(typeof(buscasType), textinho.text);
-
+            energia = 0;
+            gastos.text = "Custos: " + energia.ToString();
             switch (buscaType)
             {
                 case buscasType.Largura:
@@ -297,10 +316,11 @@ public class GameControler : MonoBehaviour
         else if (state == 4) {
             // draw path
             foreach (var elem in path) {
+                energia += custos[campo[(int)elem.x,(int)elem.y]];
                 var aux = tabuleiro[(int)elem.x, (int)elem.y].GetComponent<Renderer>();
                 aux.material.SetColor("_Color", Color.black);
             }
-
+            gastos.text = "Custos: " + energia.ToString();
             state = 5;
         }
         else if (state == 5)
@@ -319,6 +339,7 @@ public class GameControler : MonoBehaviour
 
                 if ((posAgente - posFruta).magnitude < 0.4)
                 {
+                    score++;
                     state = 0;
                 }
             }
@@ -341,7 +362,7 @@ public class GameControler : MonoBehaviour
         float r = aux.material.GetColor("_Color").r;
         float g = aux.material.GetColor("_Color").g;
         float b = aux.material.GetColor("_Color").b;
-        aux.material.SetColor("_Color", new Color(r,g,b,0.5f));
+        aux.material.SetColor("_Color", new Color(r,g,b,0.8f));
     }
 
 }

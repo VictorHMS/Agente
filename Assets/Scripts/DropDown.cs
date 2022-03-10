@@ -24,7 +24,11 @@ public class DropDown : MonoBehaviour
         }
 
         DropDownItemSelected(dropd);
+        
+        TextBox.text = dropd.options[0].text;
         dropd.onValueChanged.AddListener(delegate { DropDownItemSelected(dropd); });
+        dropd.value = 1;
+        dropd.value = 0;
     }
 
     void DropDownItemSelected(Dropdown dropd)
